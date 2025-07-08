@@ -22,6 +22,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +37,7 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,6 +72,37 @@ fun Questions(paddingValues: PaddingValues, questionViewModel: QuestionViewModel
         } else {
             Text(text = "No Questions Available")
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun showProgress(score: Int = 12){
+    val gradient = Brush.linearGradient(listOf(androidx.compose.ui.graphics.Color(0xFFF95075),
+        androidx.compose.ui.graphics.Color(0xFFBE6BE5)))
+
+    val progressFactor by remember(score) {
+        mutableFloatStateOf(score*0.005f)
+    }
+
+    Row(modifier = Modifier.padding(3.dp).fillMaxWidth().height(45.dp).
+    border(width = 4.dp, brush = Brush.linearGradient(colors = listOf(AppColors.Purple80, AppColors.Pink40)),
+        shape = RoundedCornerShape(34.dp)).clip(RoundedCornerShape(topEndPercent = 50,bottomEndPercent = 50, topStartPercent = 50, bottomStartPercent=50)).
+    background(androidx.compose.ui.graphics.Color.Transparent), verticalAlignment = Alignment.CenterVertically)  {
+
+        Button(
+            contentPadding = PaddingValues(1.dp),
+            onClick = {}, modifier = Modifier.fillMaxWidth(progressFactor).background(brush =gradient), elevation = null, enabled = false, colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.ui.graphics.Color.Transparent, disabledContainerColor = androidx.compose.ui.graphics.Color.Transparent)
+        ){
+            Text(text = (score*10).toString(),
+                modifier = Modifier.clip(shape = RoundedCornerShape(23.dp))
+                    .fillMaxHeight(0.85f)
+                    .fillMaxWidth()
+                    .padding(6.dp),
+                color = AppColors.white,
+                textAlign = TextAlign.Center)
+        }
+
     }
 }
 
@@ -112,6 +146,10 @@ fun QuestionDisplay(
     ) {
 
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start) {
+
+            if(questionIndex.value >= 3) {
+                showProgress(questionIndex.value)
+            }
             QuestionTracker(questionNumber = questionIndex.value, totalQuestions = viewModel.data.value.data?.size ?: 0)
             DrawDottedLine(PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f))
 
@@ -132,7 +170,7 @@ fun QuestionDisplay(
                             .fillMaxWidth()
                             .height(45.dp)
                             .border(width = 4.dp, brush = Brush.linearGradient(colors = listOf(AppColors.Purple80, AppColors.Pink40)), shape = RoundedCornerShape(15.dp))
-                            .clip(RoundedCornerShape(topStartPercent = 20, topEndPercent = 50, bottomEndPercent = 50, bottomStartPercent = 50))
+                            .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50, bottomEndPercent = 50, bottomStartPercent = 50))
                             .background(color = androidx.compose.ui.graphics.Color(Color.TRANSPARENT)), verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
