@@ -2,6 +2,7 @@ package com.rahul.jettrivia.component
 
 import android.graphics.Color
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -85,17 +87,26 @@ fun showProgress(score: Int = 12){
         mutableFloatStateOf(score*0.005f)
     }
 
-    Row(modifier = Modifier.padding(3.dp).fillMaxWidth().height(45.dp).
-    border(width = 4.dp, brush = Brush.linearGradient(colors = listOf(AppColors.Purple80, AppColors.Pink40)),
-        shape = RoundedCornerShape(34.dp)).clip(RoundedCornerShape(topEndPercent = 50,bottomEndPercent = 50, topStartPercent = 50, bottomStartPercent=50)).
-    background(androidx.compose.ui.graphics.Color.Transparent), verticalAlignment = Alignment.CenterVertically)  {
+    Row(modifier = Modifier
+        .padding(3.dp)
+        .fillMaxWidth()
+        .height(45.dp)
+        .border(
+            width = 4.dp, brush = Brush.linearGradient(colors = listOf(AppColors.Purple80, AppColors.Pink40)),
+            shape = RoundedCornerShape(34.dp)
+        )
+        .clip(RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50, topStartPercent = 50, bottomStartPercent = 50))
+        .background(androidx.compose.ui.graphics.Color.Transparent), verticalAlignment = Alignment.CenterVertically)  {
 
         Button(
             contentPadding = PaddingValues(1.dp),
-            onClick = {}, modifier = Modifier.fillMaxWidth(progressFactor).background(brush =gradient), elevation = null, enabled = false, colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.ui.graphics.Color.Transparent, disabledContainerColor = androidx.compose.ui.graphics.Color.Transparent)
+            onClick = {}, modifier = Modifier
+                .fillMaxWidth(progressFactor)
+                .background(brush = gradient), elevation = null, enabled = false, colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.ui.graphics.Color.Transparent, disabledContainerColor = androidx.compose.ui.graphics.Color.Transparent)
         ){
             Text(text = (score*10).toString(),
-                modifier = Modifier.clip(shape = RoundedCornerShape(23.dp))
+                modifier = Modifier
+                    .clip(shape = RoundedCornerShape(23.dp))
                     .fillMaxHeight(0.85f)
                     .fillMaxWidth()
                     .padding(6.dp),
@@ -116,6 +127,7 @@ fun QuestionDisplay(
     viewModel: QuestionViewModel = hiltViewModel(),
     onNextClicked: (Int) -> Unit = {}
 ) {
+    val context = LocalContext.current
 
     val choiceState = remember(questionItem) {
         questionItem.choices.toMutableList()
@@ -204,9 +216,14 @@ fun QuestionDisplay(
 
                 Button(
                     onClick = {
-                        onNextClicked(questionIndex.value)
+                        if (answerState.value != null) {
+                            onNextClicked(questionIndex.value)
+                        } else {
+                            Toast.makeText(context, "Please select an answer first", Toast.LENGTH_SHORT).show()
+                        }
                     }, modifier = Modifier
                         .padding(3.dp)
+                        .padding(top = 16.dp)
                         .align(alignment = Alignment.CenterHorizontally),
                     shape = RoundedCornerShape(34.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.PurpleGrey80)
